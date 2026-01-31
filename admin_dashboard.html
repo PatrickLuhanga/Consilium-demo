@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Consilium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="admin_dashboard.js" defer></script>
+</head>
+<body class="bg-gray-100 font-sans min-h-screen">
+
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-8">
+                <div class="flex items-center gap-2 text-indigo-900 font-extrabold text-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
+                        <path d="M480-120 200-272v-240L40-600l440-240 440 240v320h-80v-276l-80 44v240L480-120Zm0-332 274-148-274-148-274 148 274 148Zm0 241 200-108v-151L480-360 280-470v151l200 108Zm0-241Zm0 90Zm0 0Z"/>
+                    </svg>
+                    Consilium
+                </div>
+
+                <nav class="hidden md:flex gap-6 text-sm text-gray-600 items-center">
+                    <a href="admin_dashboard.html" class="text-indigo-600 font-bold border-b-2 border-indigo-600 pb-1">Dashboard</a>
+                    <a href="admin_bursaries.html" class="hover:text-indigo-700 transition">Manage Bursaries</a>
+                    <a href="admin_applications.html" class="hover:text-indigo-700 transition">Applications</a> 
+                </nav>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <button id="logout-btn" class="text-sm font-medium text-gray-500 hover:text-red-600 transition">Logout</button>
+                <a href="profile.html" class="hover:opacity-80 transition-opacity">
+                    <div class="h-9 w-9 rounded-full bg-indigo-900 text-white flex items-center justify-center text-sm font-semibold shadow-sm ring-2 ring-indigo-100">
+                        AD
+                    </div>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-10">
+
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Admin Overview</h1>
+                <p class="text-gray-500 mt-1">Monitor activity and manage opportunities.</p>
+            </div>
+            
+            <a href="admin_bursaries.html" class="bg-indigo-600 text-white px-4 py-2 md:px-5 md:py-2.5 rounded-lg font-bold hover:bg-indigo-700 shadow-sm transition flex items-center gap-2 text-xs md:text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                Post New Bursary
+            </a>
+        </div>
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+            <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                <p class="text-sm text-gray-500 font-bold uppercase tracking-wide">Active Bursaries</p>
+                <p id="stat-active" class="text-3xl font-extrabold text-gray-900 mt-2">0</p>
+            </div>
+            <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                <p class="text-sm text-gray-500 font-bold uppercase tracking-wide">Total Applications</p>
+                <p id="stat-total" class="text-3xl font-extrabold text-gray-900 mt-2">0</p>
+            </div>
+        </section>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            
+            <div class="grid grid-cols-12 bg-gray-50 p-4 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                <div class="col-span-6">Bursary Details</div>
+                <div class="col-span-3 text-center">Closing Date</div>
+                <div class="col-span-3 text-right">Actions</div>
+            </div>
+
+            <div id="admin-bursary-list" class="divide-y divide-gray-100">
+                </div>
+        </div>
+
+    </main>
+</body>
+</html>

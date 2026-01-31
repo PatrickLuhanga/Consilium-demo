@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Add Bursary</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="admin_bursaries.js" defer></script>
+</head>
+<body class="bg-gray-100 font-sans min-h-screen">
+
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-8">
+                <div class="flex items-center gap-2 text-indigo-900 font-extrabold text-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
+                        <path d="M480-120 200-272v-240L40-600l440-240 440 240v320h-80v-276l-80 44v240L480-120Zm0-332 274-148-274-148-274 148 274 148Zm0 241 200-108v-151L480-360 280-470v151l200 108Zm0-241Zm0 90Zm0 0Z"/>
+                    </svg>
+                    Consilium 
+                </div>
+
+                <nav class="hidden md:flex gap-6 text-sm text-gray-600 items-center">
+                    <a href="admin_dashboard.html" class="hover:text-indigo-700 transition">Dashboard</a>
+                    <a href="admin_bursaries.html" class="text-indigo-600 font-bold border-b-2 border-indigo-600 pb-1">Manage Bursaries</a>
+                    <a href="admin_applications.html" class="hover:text-indigo-700 transition">Applications</a> 
+                </nav>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <button id="logout-btn" class="text-sm font-medium text-gray-500 hover:text-red-600 transition">Logout</button>
+                <a href="profile.html" class="hover:opacity-80 transition-opacity" title="View Profile">
+                    <div class="h-9 w-9 rounded-full bg-indigo-900 text-white flex items-center justify-center text-sm font-semibold shadow-sm ring-2 ring-indigo-100">
+                        AD
+                    </div>
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        
+        <div class="flex justify-between items-end mb-8">
+            <div>
+                <h2 class="text-3xl font-extrabold text-gray-900">Create New Bursary</h2>
+                <p class="text-gray-600 mt-1">Publish a new opportunity for students.</p>
+            </div>
+        </div>
+
+        <form id="admin-add-bursary-form" class="bg-white p-8 rounded-xl shadow-lg border border-gray-200 space-y-8">
+
+            <fieldset>
+                <legend class="text-lg font-bold text-indigo-900 border-b border-gray-200 w-full pb-2 mb-4">1. Opportunity Details</legend>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="bursary-name" class="block text-sm font-bold text-gray-700 mb-1">Bursary Title</label>
+                        <input type="text" id="bursary-name" required placeholder="e.g. Tech Future Leaders" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                    </div>
+                    <div>
+                        <label for="provider" class="block text-sm font-bold text-gray-700 mb-1">Provider Name</label>
+                        <input type="text" id="provider" required placeholder="e.g. Investec" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <label for="external-link" class="block text-sm font-bold text-gray-700 mb-1">Application URL</label>
+                    <input type="url" id="external-link" required placeholder="https://..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                </div>
+
+                <div class="mt-4">
+                    <label for="description" class="block text-sm font-bold text-gray-700 mb-1">Description / Requirements</label>
+                    <textarea id="description" rows="4" placeholder="Describe the bursary and any specific requirements..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition"></textarea>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend class="text-lg font-bold text-indigo-900 border-b border-gray-200 w-full pb-2 mb-4">2. Eligibility Criteria</legend>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="min-average" class="block text-sm font-bold text-gray-700 mb-1">Min Average (%)</label>
+                        <input type="number" id="min-average" required min="0" max="100" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                    </div>
+                    <div>
+                        <label for="max-income" class="block text-sm font-bold text-gray-700 mb-1">Max Household Income</label>
+                        <input type="number" id="max-income" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                    </div>
+                    <div>
+                        <label for="deadline" class="block text-sm font-bold text-gray-700 mb-1">Closing Date</label>
+                        <input type="date" id="deadline" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <label class="block text-sm font-bold text-gray-700 mb-3">Eligible Faculties</label>
+                    <div class="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="eligible-faculty" value="Engineering" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500">
+                            <span class="text-sm text-gray-700">Engineering & Built Environment</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="eligible-faculty" value="Applied Sciences" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500">
+                            <span class="text-sm text-gray-700">Applied Sciences</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="eligible-faculty" value="Accounting and Informatics" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500">
+                            <span class="text-sm text-gray-700">Accounting & Informatics</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="eligible-faculty" value="Management Sciences" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500">
+                            <span class="text-sm text-gray-700">Management Sciences</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="eligible-faculty" value="Arts and Design" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500">
+                            <span class="text-sm text-gray-700">Arts & Design</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="eligible-faculty" value="Health Sciences" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500">
+                            <span class="text-sm text-gray-700">Health Sciences</span>
+                        </label>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="pt-4">
+                <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition duration-300 shadow-lg flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" fill="currentColor"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
+                    Publish Bursary Opportunity
+                </button>
+            </div>
+            
+        </form>
+    </div>
+</body>
+</html>

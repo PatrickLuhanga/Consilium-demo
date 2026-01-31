@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Consilium Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="dashboard.js" defer></script>
+  </head>
+
+  <body class="bg-gray-100 text-gray-800 font-sans">
+    
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-8">
+          
+          <div class="flex items-center gap-2 text-indigo-900 font-extrabold text-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
+                <path d="M480-120 200-272v-240L40-600l440-240 440 240v320h-80v-276l-80 44v240L480-120Zm0-332 274-148-274-148-274 148 274 148Zm0 241 200-108v-151L480-360 280-470v151l200 108Zm0-241Zm0 90Zm0 0Z"/>
+            </svg>
+            Consilium
+          </div>
+
+          <nav class="hidden md:flex gap-6 text-sm text-gray-600 items-center">
+            <a href="dashboard.html" class="text-indigo-600 font-bold border-b-2 border-indigo-600 pb-1">Dashboard</a>
+            <a href="bursaries.html" class="hover:text-indigo-700 transition">Bursaries</a>
+            <a href="grades.html" class="hover:text-indigo-700 transition">Grades/Timetable</a> 
+          </nav>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <a href="profile.html" class="hover:opacity-80 transition-opacity" title="View Profile">
+                <div class="h-9 w-9 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-semibold shadow-sm">
+                    ..
+                </div>
+            </a>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-10">
+      
+      <section class="mb-8">
+        <h1 id="welcome-msg" class="text-2xl md:text-3xl font-extrabold text-gray-900">Welcome back</h1>
+        <p class="text-gray-500 mt-1">Here's your academic overview</p>
+      </section>
+
+      <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+        
+        <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition">
+          <p class="text-sm text-gray-500 font-medium">Matched Bursaries</p>
+          <p id="dash-match-count" class="text-3xl font-extrabold text-gray-900 mt-2">0</p>
+          <p class="text-xs text-gray-400 mt-1">Based on your profile</p>
+        </div>
+
+        <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition">
+          <p class="text-sm text-gray-500 font-medium">Applications</p>
+          <p id="dash-app-count" class="text-3xl font-extrabold text-gray-900 mt-2">0</p>
+          <p class="text-xs text-gray-400 mt-1">Tracked statuses</p>
+        </div>
+
+        <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition">
+          <p class="text-sm text-gray-500 font-medium">Semester Average</p>
+          <p id="dash-avg-mark" class="text-3xl font-extrabold text-gray-900 mt-2">0%</p>
+          <p id="dash-module-count" class="text-xs text-gray-400 mt-1">0 subjects</p>
+        </div>
+
+        <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition">
+          <p class="text-sm text-gray-500 font-medium">At Risk</p>
+          <p id="dash-risk-count" class="text-3xl font-extrabold text-gray-900 mt-2">0</p>
+          <p class="text-xs text-gray-400 mt-1">Modules < 50%</p>
+        </div>
+      </section>
+
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <div class="lg:col-span-2">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="font-bold text-lg text-gray-800">Top Bursary Matches</h2>
+                <a href="bursaries.html" class="text-sm text-indigo-600 font-bold hover:underline">View All</a>
+            </div>
+            <div id="bursary-list-container" class="space-y-4">
+                <p class="text-gray-400 text-sm">Loading matches...</p>
+            </div>
+        </div>
+
+        <aside>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="font-bold text-lg text-gray-800">Subject Status</h2>
+            <a href="grades.html" class="text-xs text-gray-600 font-bold hover:text-indigo-600 bg-white border border-gray-200 px-3 py-1 rounded-lg transition">+ Add</a>
+          </div>
+
+          <div id="subject-status-container" class="space-y-3">
+             </div>
+        </aside>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reset Password - Consilium</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="forgot_pass.js" defer></script>
+</head>
+<body class="bg-[url('background.jpg')] bg-cover bg-center font-sans min-h-screen flex items-center justify-center p-6">
+  
+
+  <div class="w-full max-w-[490px] bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 transition-all duration-300">
+    
+    <div id="reset-form-container">
+        <header class="text-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-900">Forgot Password?</h1>
+            <p class="text-gray-500 mt-1 text-sm">Enter your email and we'll send you a reset link.</p>
+        </header>
+        
+        <hr class="border-gray-200 mb-6">
+
+        <form id="reset-form" class="space-y-4">
+        <div>
+            <label for="email" class="font-bold block text-gray-800 mb-1">Email Address:</label>
+            <div class="flex items-center bg-white rounded-lg border border-gray-300 px-3 py-2 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" fill="#4b5563">
+                    <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200ZM160-640v-80 480-400Z"/>
+                </svg>
+                <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                required 
+                placeholder="student@dut4life.ac.za"
+                class="w-full ml-3 outline-none text-gray-700 bg-transparent h-full"
+                />
+            </div>
+            <p id="email-error" class="text-red-600 text-sm mt-1 hidden"></p>
+        </div>
+        
+        <button 
+            type="submit" 
+            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-lg shadow-md transition-all duration-300 transform active:scale-95 mt-2">
+            Send Reset Link
+        </button>
+        </form>
+    </div>
+
+    <div id="success-message" class="hidden text-center py-4">
+        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+            <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">Check your mail</h2>
+        <p class="text-gray-500 text-sm mb-6">
+            We have sent a password recover instructions to your email.
+        </p>
+        <a href="login.html" class="w-full block bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2.5 rounded-lg transition">
+            Back to Login
+        </a>
+    </div>
+    
+    <div id="footer-link" class="mt-6 text-sm text-center text-gray-600">
+      Remembered your password?
+      <a href="login.html" class="text-blue-700 hover:underline font-semibold">Back to login</a>
+    </div>
+
+  </div>
+
+</body>
+</html>

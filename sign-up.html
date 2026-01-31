@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sign-up</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="validation.js" defer></script>
+</head>
+<body class="bg-[url('background.jpg')] bg-cover bg-center font-sans min-h-screen justify-center items-center flex flex-col space-y-4 p-6">
+
+    
+    <form id="form"data-type="signup" class="bg-white/90 text-black backdrop-blur-sm rounded-2xl shadow-lg w-full max-w-[490px] p-8 space-y-4 justify-center">
+
+
+        <header class="text-center mb-4">
+            <h1 class="font-bold">SIGN UP</h1>
+            <p>Please fill in the form to create an account.</p>
+           
+        </header><hr><br>
+
+     <div class="flex justify-between ">
+            <div class="mr-2 ">   
+            <label for="fname" class="font-bold ">First Name:</label><br>
+
+              <div class="flex items-center bg rounded-lg px-2" >
+                  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg>
+                  <input type="text" id="fname" name="fname" class="w-full h-9 rounded-lg border border-gray-300 focus:border-gray-300 focus:outline-none p-5 ml-3" required/>
+                  <p class="text-red-600 text-sm mt-1" id="fname-error"></p>
+              </div>
+            
+            </div><br>
+    
+          <div class="text-inherit"> 
+              <label for="lname" class="font-bold w-1/2">Last Name:</label><br>
+              <div class="flex items-center  rounded-lg px-2" >
+                  
+              <input type="text" id="lname" name="lname" class="w-full h-9 rounded-lg border border-gray-300 focus:border-gray-300 focus:outline-none p-5 ml-3" required/>
+                  <p class="text-red-600 text-sm mt-1" id="lname-error"></p>
+              </div>
+
+          </div>
+     </div>
+
+    
+
+     <div class="text-inherit">
+        <label for="email" class="font-bold ">Email:</label><br>
+        <div class="flex items-center  rounded-lg px-2" >
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200ZM160-640v-80 480-400Z"/></svg>
+    <input type="email" id="email" name="email" class="w-full h-9 rounded-lg border border-gray-300 text-inherit ml-4" required/>
+    <p class="text-red-600 text-sm mt-1" id="email-error"></p>
+   
+</div>
+
+     </div>
+
+    <div class="text-inherit">
+  <label for="affiliation" class="font-bold">Affiliation:</label><br>
+  <div class="flex items-center  rounded-lg px-2" >
+<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M160-120q-50 0-85-35t-35-85q0-50 35-85t85-35q9 0 17.5 1.5T194-355l162-223q-17-21-26.5-47t-9.5-55q0-66 47-113t113-47q66 0 113 47t47 113q0 29-10 55t-27 47l163 223q8-2 16.5-3.5T800-360q50 0 85 35t35 85q0 50-35 85t-85 35q-50 0-85-35t-35-85q0-19 5.5-36.5T701-308L539-531q-5 2-9.5 3t-9.5 3v172q35 12 57.5 43t22.5 70q0 50-35 85t-85 35q-50 0-85-35t-35-85q0-39 22.5-69.5T440-353v-172q-5-2-9.5-3t-9.5-3L259-308q10 14 15.5 31.5T280-240q0 50-35 85t-85 35Zm0-80q17 0 28.5-11.5T200-240q0-17-11.5-28.5T160-280q-17 0-28.5 11.5T120-240q0 17 11.5 28.5T160-200Zm320-480Zm0 480q17 0 28.5-11.5T520-240q0-17-11.5-28.5T480-280q-17 0-28.5 11.5T440-240q0 17 11.5 28.5T480-200Zm320 0q17 0 28.5-11.5T840-240q0-17-11.5-28.5T800-280q-17 0-28.5 11.5T760-240q0 17 11.5 28.5T800-200Zm-640-40Zm320 0Zm320 0ZM480-600q33 0 56.5-23.5T560-680q0-33-23.5-56.5T480-760q-33 0-56.5 23.5T400-680q0 33 23.5 56.5T480-600Z"/></svg>
+  <select id="affiliation" name="affiliation" class="w-full h-9 rounded-lg border border-gray-300 text-inherit ml-4" required>
+    <option value="">Select...</option>
+    <option value="student">Student</option>
+    <option value="staff">Staff</option>
+    <option value="admin">Admin</option>
+  </select>
+  <p class="text-red-600 text-sm mt-1" id="affiliation-error"></p>
+</div>
+  
+</div><br>
+
+     
+    
+    <div class="flex justify-between ">
+        <div class="mr-4">
+        <label for="psw" class="font-bold ">Password:</label><br>
+        <div class="flex items-center  rounded-lg px-2" >
+       <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M240-80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h40v-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Zm0-80h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM360-640h240v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80ZM240-160v-400 400Z"/></svg>
+        <input type="password" id="psw" name="psw" class="w-full h-9 rounded-lg border border-gray-300 ml-4 text-inherit" required/>
+        <p class="text-red-600 text-sm mt-1" id="psw-error"></p>
+    
+</div>
+     </div><br>
+
+
+    <div >
+        <label for="confirmpsw" class="font-bold  ">Confirm Password:</label><br>
+        <div class="flex items-center  rounded-lg px-2" >
+      <input type="password" id="confirmpsw" name="confirmpsw" class="w-full h-9 rounded-lg border border-gray-300 text-inherit" required/>
+        <p class="text-red-600 text-sm mt-1" id="confirmpsw-error"></p>
+    
+</div>
+      </div><br>
+
+    </div>
+
+ 
+   
+
+    <br><div class="flex justify-center">
+        <input type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg w-3/4 h-9" value="Sign Up"/>
+    </div>
+
+    <p class="flex justify-center">Already have an account? <a class="text-blue-700"  href="login.html">Login</a></p>
+     
+    </form>
+</body>
+</html>
