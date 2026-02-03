@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!currentUser) {
         window.location.href = "login.html";
@@ -74,6 +75,7 @@ function renderTable() {
     const sortedApps = applications.sort((a, b) => new Date(b.dateApplied) - new Date(a.dateApplied));
 
     sortedApps.forEach(app => {
+        
         if (statusFilter !== 'all' && app.status !== statusFilter) return;
         const cleanFaculty = (app.studentFaculty || "").toLowerCase();
         if (facultyFilter !== 'all' && !cleanFaculty.includes(facultyFilter)) return;
