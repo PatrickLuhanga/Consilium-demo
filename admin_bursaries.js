@@ -1,25 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // 1. AUTH CHECK
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!currentUser) {
         window.location.href = "login.html";
         return;
     }
 
-    // 🛑 2. ROLE CHECK (The Gatekeeper)
-    // Security: If a Student tries to load this Admin page, kick them to Student Dashboard
     if (currentUser.affiliation !== 'admin') {
         window.location.href = "dashboard.html";
         return;
     }
 
-    // 3. SET HEADER INITIALS
     const initials = ((currentUser.fname?.[0] || 'A') + (currentUser.lname?.[0] || '')).toUpperCase();
     const avatar = document.querySelector(".rounded-full");
     if(avatar) avatar.textContent = initials;
 
-    // 4. LOGOUT LOGIC
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
@@ -30,14 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 5. HANDLE FORM SUBMISSION (Add Bursary)
     const form = document.getElementById('admin-add-bursary-form');
     
     if (form) {
         form.addEventListener('submit', function(event) {
             event.preventDefault();
 
-            // Gather Inputs
             const name = document.getElementById('bursary-name').value;
             const provider = document.getElementById('provider').value;
             const link = document.getElementById('external-link').value;
@@ -47,14 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const minAverage = document.getElementById('min-average').value;
             const deadline = document.getElementById('deadline').value;
 
-            // Handle Checkboxes (Faculties)
             const selectedFaculties = [];
             const checkboxes = document.querySelectorAll('input[name="eligible-faculty"]:checked');
             checkboxes.forEach((checkbox) => {
                 selectedFaculties.push(checkbox.value);
             });
 
-            // Create Object (Standardized Format)
             const newBursary = {
                 id: Date.now(), 
                 title: name,
@@ -68,7 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 status: "Active"
             };
 
-            // Save to LocalStorage
             let bursaryList = JSON.parse(localStorage.getItem('bursaries')) || [];
             bursaryList.push(newBursary);
             localStorage.setItem('bursaries', JSON.stringify(bursaryList));
@@ -77,4 +67,5 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'admin_dashboard.html'; 
         });
     }
+
 });
