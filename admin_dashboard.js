@@ -1,25 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // 1. AUTH CHECK
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!currentUser) {
         window.location.href = "login.html";
         return;
     }
 
-    // 🛑 2. ROLE CHECK (The Gatekeeper)
-    // Security: If a Student tries to load this Admin page, kick them back to Student Dashboard
     if (currentUser.affiliation !== 'admin') {
         window.location.href = "dashboard.html";
         return;
     }
 
-    // 3. SET HEADER INITIALS
     const initials = ((currentUser.fname?.[0] || 'A') + (currentUser.lname?.[0] || '')).toUpperCase();
     const avatar = document.querySelector(".rounded-full");
     if(avatar) avatar.textContent = initials;
 
-    // 4. LOGOUT LOGIC
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
@@ -30,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 5. LOAD DATA & STATS
     loadDashboard();
 });
 
@@ -38,18 +32,14 @@ function loadDashboard() {
     const bursaries = JSON.parse(localStorage.getItem('bursaries')) || [];
     const applications = JSON.parse(localStorage.getItem('applications')) || [];
 
-    // --- CALCULATE STATS ---
     const activeCount = bursaries.length;
-    // Count only submitted applications (ignore 'Interested' if you use that status)
     const totalApps = applications.filter(a => a.status === 'Applied').length;
 
-    // Update DOM Stats
     setText('stat-active', activeCount);
     setText('stat-total', totalApps);
 
-    // --- RENDER LIST ---
     const listContainer = document.getElementById('admin-bursary-list');
-    if (!listContainer) return; // Safety check
+    if (!listContainer) return; 
     
     listContainer.innerHTML = '';
 
@@ -62,14 +52,12 @@ function loadDashboard() {
         return;
     }
 
-    // Sort by newest first (optional but nice)
     const sortedBursaries = bursaries.sort((a, b) => b.id - a.id);
 
     sortedBursaries.forEach((b) => {
         const row = document.createElement('div');
         row.className = "grid grid-cols-12 p-4 items-center hover:bg-gray-50 transition border-b border-gray-100 last:border-0";
         
-        // Handle Faculties Display
         let facultyText = "All Faculties";
         if (b.faculties && b.faculties.length > 0) {
             facultyText = b.faculties.join(', ');
@@ -102,7 +90,6 @@ function deleteBursary(id) {
         bursaries = bursaries.filter(b => b.id !== id);
         localStorage.setItem('bursaries', JSON.stringify(bursaries));
         
-        // Refresh the list immediately
         loadDashboard();
     }
 }
