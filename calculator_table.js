@@ -1,6 +1,3 @@
-// calculator_table.js
-
-// --- 1. DATA INITIALIZATION ---
 let allModules = []; 
 let userModules = []; 
 let currentUserEmail = "";
@@ -12,10 +9,7 @@ try {
         currentUserEmail = user.email;
     }
     
-    // Load ALL data
     allModules = JSON.parse(localStorage.getItem('consilium_modules')) || [];
-    
-    // Filter for THIS user
     userModules = allModules.filter(m => m.userEmail === currentUserEmail);
 
 } catch (e) {
@@ -24,31 +18,25 @@ try {
     userModules = [];
 }
 
-// Set Active Module based on USER list
 let activeModuleId = userModules.length > 0 ? userModules[0].id : null;
 
-// --- 2. EVENT LISTENERS ---
 document.addEventListener('DOMContentLoaded', () => {
     
-    // 1. GET USER & AUTH CHECK (Fix: Do this first!)
     const user = JSON.parse(localStorage.getItem('currentUser'));
     if (!user) {
         window.location.href = "login.html";
         return;
     }
 
-    // 2. ROLE CHECK (The Gatekeeper)
     if (user.affiliation === 'admin') {
         window.location.href = "admin_dashboard.html";
         return;
     }
 
-    // 3. Update Header Initials
     const initials = ((user.fname?.[0] || 'U') + (user.lname?.[0] || '')).toUpperCase();
     const avatar = document.querySelector(".rounded-full");
     if(avatar) avatar.textContent = initials;
 
-    // 4. ATTACH LISTENERS
     const masterBtn = document.getElementById('save-calc-btn');
     if (masterBtn) {
         masterBtn.addEventListener('click', handleSaveAndCalculate);
@@ -56,27 +44,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const addRowBtn = document.getElementById('add-assessment-row');
     if (addRowBtn) {
-        addRowBtn.addEventListener('click', () => addNewRowUI("", 0, 0));
+        addRowBtn.addEventListener('click', () => addNewRowUI("", 0, ""));
     }
 
-    // 5. RENDER UI
+    const goalInput = document.getElementById('goal-input');
+    if (goalInput) goalInput.addEventListener('input', calculateGrades);
+
+    const examInput = document.getElementById('exam-weight-config');
+    const dpInput = document.getElementById('dp-weight-config');
+    if (examInput && dpInput) {
+        examInput.addEventListener('input', () => {
+            let val = parseFloat(examInput.value) || 0;
+            if (val > 100) val = 100;
+            dpInput.value = 100 - val;
+            calculateGrades();
+        });
+        dpInput.addEventListener('input', () => {
+            let val = parseFloat(dpInput.value) || 0;
+            if (val > 100) val = 100;
+            examInput.value = 100 - val;
+            calculateGrades();
+        });
+    }
+
     renderModuleGrid();
     loadActiveModule(); 
 });
 
-// --- 3. MASTER SAVE HANDLER ---
 function handleSaveAndCalculate() {
     const masterBtn = document.getElementById('save-calc-btn');
     try {
-        updateDataFromUI(); // Save to Local Vars
-        saveToStorage();    // Persist to LocalStorage
-        calculateGrades();  // Run Math
-        renderModuleGrid(); // Update Sidebar
+        updateDataFromUI(); 
+        saveToStorage();    
+        calculateGrades();  
+        renderModuleGrid(); 
         
-        // Success Feedback
         if (masterBtn) {
             const originalHTML = masterBtn.innerHTML;
-            masterBtn.innerHTML = "✅ Saved!";
+            masterBtn.innerHTML = "Saved!";
             masterBtn.classList.replace('bg-indigo-600', 'bg-green-600');
             setTimeout(() => {
                 masterBtn.innerHTML = originalHTML;
@@ -89,26 +94,17 @@ function handleSaveAndCalculate() {
     }
 }
 
-// --- 4. DATA SAVING ---
 function saveToStorage() {
-    // 1. Remove this user's old data from the master list
     allModules = allModules.filter(m => m.userEmail !== currentUserEmail);
-    
-    // 2. Add the updated user modules back in
     allModules = [...allModules, ...userModules];
-    
-    // 3. Save the master list
     localStorage.setItem('consilium_modules', JSON.stringify(allModules));
 }
-
-// --- 5. UI RENDERING FUNCTIONS ---
 
 function renderModuleGrid() {
     const grid = document.getElementById('module-grid');
     if (!grid) return;
     grid.innerHTML = ''; 
 
-    // Render ONLY user modules
     userModules.forEach(mod => {
         const isActive = mod.id === activeModuleId;
         const card = document.createElement('div');
@@ -136,7 +132,6 @@ function loadActiveModule() {
     const emptyState = document.getElementById('empty-state-msg');
     const calcUI = document.getElementById('calculator-ui');
     
-    // Find in USER list
     const mod = userModules.find(m => m.id === activeModuleId);
 
     if (!mod) {
@@ -155,36 +150,35 @@ function loadActiveModule() {
     if (codeEl) codeEl.innerText = mod.code;
 
     const examInput = document.getElementById('exam-weight-config');
+    const dpInput = document.getElementById('dp-weight-config');
     if (examInput) examInput.value = mod.examWeight;
+    if (dpInput) dpInput.value = 100 - mod.examWeight;
 
     const goalInput = document.getElementById('goal-input');
     if (goalInput) goalInput.value = mod.goal;
     
-    // Setup Assessment List
     const list = document.getElementById('assessment-list');
     if (!list) return;
     list.innerHTML = ''; 
 
-    // Add Button
     const addBtn = document.createElement('button');
     addBtn.id = 'add-assessment-row';
     addBtn.type = 'button';
-    addBtn.className = 'col-span-1 sm:col-span-4 text-xs text-indigo-600 font-semibold hover:text-indigo-800 mt-2 flex items-center gap-1 justify-start';
+    addBtn.className = 'col-span-1 sm:col-span-5 text-xs text-indigo-600 font-semibold hover:text-indigo-800 mt-2 flex items-center gap-1 justify-start';
     addBtn.textContent = '+ Add Assessment';
-    addBtn.onclick = () => addNewRowUI("", 0, 0);
+    addBtn.onclick = () => addNewRowUI("", 0, ""); 
     list.appendChild(addBtn);
 
-    // Populate Rows
     if (mod.assessments && mod.assessments.length > 0) {
         mod.assessments.forEach(ass => addNewRowUI(ass.name, ass.weight, ass.mark));
     } else {
-        addNewRowUI("", 0, 0);
+        addNewRowUI("", 0, "");
     }
 
     calculateGrades();
 }
 
-function addNewRowUI(name = "", weight = 0, mark = 0) {
+function addNewRowUI(name = "", weight = 0, mark = "") {
     const list = document.getElementById('assessment-list');
     if (!list) return;
 
@@ -199,12 +193,18 @@ function addNewRowUI(name = "", weight = 0, mark = 0) {
     weightInput.value = weight;
     weightInput.placeholder = 'Weight';
     weightInput.className = 'assessment-weight p-2 border border-gray-300 rounded text-center text-sm w-full max-w-[80px] mx-auto';
+    weightInput.addEventListener('input', calculateGrades); 
 
     const markInput = document.createElement('input');
     markInput.type = 'number';
-    markInput.value = mark;
-    markInput.placeholder = 'Mark';
+    markInput.value = mark; 
+    markInput.placeholder = '-';
     markInput.className = 'assessment-mark p-2 bg-indigo-50 border border-indigo-200 text-indigo-800 font-bold rounded text-center text-sm w-full max-w-[80px] mx-auto';
+    markInput.addEventListener('input', calculateGrades); 
+
+    const suggestedSpan = document.createElement('div');
+    suggestedSpan.className = 'assessment-suggested text-center text-sm font-bold text-gray-400 bg-gray-50 rounded p-2 flex items-center justify-center h-[38px] w-full max-w-[80px] mx-auto';
+    suggestedSpan.innerText = '-';
 
     const delBtn = document.createElement('button');
     delBtn.type = 'button';
@@ -215,6 +215,7 @@ function addNewRowUI(name = "", weight = 0, mark = 0) {
         nameInput.remove();
         weightInput.remove();
         markInput.remove();
+        suggestedSpan.remove();
         delBtn.remove();
         handleSaveAndCalculate(); 
     };
@@ -224,6 +225,7 @@ function addNewRowUI(name = "", weight = 0, mark = 0) {
         list.insertBefore(nameInput, addBtn);
         list.insertBefore(weightInput, addBtn);
         list.insertBefore(markInput, addBtn);
+        list.insertBefore(suggestedSpan, addBtn);
         list.insertBefore(delBtn, addBtn);
     }
 }
@@ -242,10 +244,13 @@ function updateDataFromUI() {
     mod.assessments = [];
     
     for (let i = 0; i < weights.length; i++) {
+        let mVal = marks[i].value.trim(); 
+        if(mVal !== "") mVal = parseFloat(mVal);
+
         mod.assessments.push({
             name: names[i] ? names[i].value : "",
             weight: parseFloat(weights[i].value) || 0,
-            mark: parseFloat(marks[i].value) || 0
+            mark: mVal
         });
     }
 }
@@ -258,14 +263,52 @@ function calculateGrades() {
     const marks = document.querySelectorAll('.assessment-mark');
 
     let weightedSum = 0;
-    let totalAssessmentWeight = 0;
+    let totalCompletedWeight = 0;
+    let totalConfiguredWeight = 0;
+    let remainingWeight = 0; 
 
     for (let i = 0; i < weights.length; i++) {
         const w = parseFloat(weights[i].value) || 0;
-        const m = parseFloat(marks[i].value) || 0;
-        if (w > 0) {
+        const markVal = marks[i].value.trim(); 
+        
+        totalConfiguredWeight += w;
+
+        if (w > 0 && markVal !== "") {
+            const m = parseFloat(markVal);
             weightedSum += (m * w);
-            totalAssessmentWeight += w;
+            totalCompletedWeight += w;
+        } else if (w > 0 && markVal === "") {
+            remainingWeight += w; 
+        }
+    }
+
+    let targetDP = goal; 
+    let neededDPPoints = (targetDP * totalConfiguredWeight) - weightedSum;
+    let suggestedMark = remainingWeight > 0 ? (neededDPPoints / remainingWeight) : 0;
+    let displaySuggested = Math.round(suggestedMark);
+
+    const suggestedSpans = document.querySelectorAll('.assessment-suggested');
+    for (let i = 0; i < weights.length; i++) {
+        const markVal = marks[i].value.trim();
+        const w = parseFloat(weights[i].value) || 0;
+
+        if (markVal === "") {
+            if (w > 0 && remainingWeight > 0) {
+                // Here is the 100%+ visual fix
+                if (displaySuggested > 100) {
+                    suggestedSpans[i].innerText = "100%+";
+                    suggestedSpans[i].className = 'assessment-suggested text-center text-xs sm:text-sm font-bold rounded p-2 flex items-center justify-center h-[38px] w-full max-w-[80px] mx-auto bg-red-50 text-red-600';
+                } else {
+                    suggestedSpans[i].innerText = (displaySuggested > 0 ? displaySuggested : 0) + "%";
+                    suggestedSpans[i].className = 'assessment-suggested text-center text-xs sm:text-sm font-bold rounded p-2 flex items-center justify-center h-[38px] w-full max-w-[80px] mx-auto bg-indigo-50 text-indigo-600 border border-indigo-100 shadow-sm';
+                }
+            } else {
+                suggestedSpans[i].innerText = "-";
+                suggestedSpans[i].className = 'assessment-suggested text-center text-sm font-bold text-gray-400 bg-gray-50 rounded p-2 flex items-center justify-center h-[38px] w-full max-w-[80px] mx-auto';
+            }
+        } else {
+            suggestedSpans[i].innerText = "✓";
+            suggestedSpans[i].className = 'assessment-suggested text-center text-sm font-bold text-green-500 bg-green-50 rounded p-2 flex items-center justify-center h-[38px] w-full max-w-[80px] mx-auto';
         }
     }
 
@@ -277,41 +320,86 @@ function calculateGrades() {
             warningMsg.id = 'weight-warning-msg';
             dpDisplay.parentElement.appendChild(warningMsg);
         }
-        if (totalAssessmentWeight < 100) {
-            warningMsg.innerText = `⚠️ Total: ${totalAssessmentWeight}%. Missing ${100 - totalAssessmentWeight}%.`;
+        if (totalConfiguredWeight < 100) {
+            warningMsg.innerText = `Setup: ${totalConfiguredWeight}% / 100% accounted for.`;
             warningMsg.className = "text-xs text-orange-600 font-bold mt-1 block";
-        } else if (totalAssessmentWeight > 100) {
-            warningMsg.innerText = `🚫 Total: ${totalAssessmentWeight}%. Exceeds 100%.`;
+        } else if (totalConfiguredWeight > 100) {
+            warningMsg.innerText = `Setup: ${totalConfiguredWeight}%. Exceeds 100%.`;
             warningMsg.className = "text-xs text-red-600 font-bold mt-1 block";
         } else {
-            warningMsg.innerText = "✅ Weights total 100%";
+            warningMsg.innerText = "Setup complete (100%)";
             warningMsg.className = "text-xs text-green-600 font-bold mt-1 block";
         }
     }
 
-    const currentDP = totalAssessmentWeight > 0 ? weightedSum / totalAssessmentWeight : 0;
-    const dpWeightDisp = document.getElementById('dp-weight-display');
-    if (dpWeightDisp) dpWeightDisp.innerText = `(DP Weight is at ${dpW}%)`;
-    if (dpDisplay) dpDisplay.innerText = Math.round(currentDP) + "%";
+    const accumulatedDP = weightedSum / 100; 
+    const runningAverageDP = totalCompletedWeight > 0 ? weightedSum / totalCompletedWeight : 0;
+    
+    if (dpDisplay) {
+        // Pace UI removed below
+        dpDisplay.innerHTML = `
+            <div class="text-right">
+                <div class="text-2xl font-bold text-gray-800">${Math.round(accumulatedDP)} <span class="text-sm text-gray-400 font-normal">/ 100</span></div>
+            </div>
+        `;
+    }
 
     const displayReq = document.getElementById('display-exam-req');
-    const explHand = document.getElementById('expl-points-in-hand');
-    const explNeed = document.getElementById('expl-points-needed');
-    document.getElementById('display-goal-text').innerText = goal;
+    const explContainer = document.getElementById('points-explanation');
+    const displayGoalText = document.getElementById('display-goal-text');
+
+    if (displayGoalText) displayGoalText.innerText = goal;
     
     if (displayReq && examW > 0) {
-        const pointsInHand = currentDP * (dpW / 100);
-        const pointsNeeded = goal - pointsInHand;
-        const reqExam = pointsNeeded / (examW / 100);
-        const finalVal = Math.round(reqExam);
-
-        if (explHand) explHand.innerText = pointsInHand.toFixed(1);
-        if (explNeed) explNeed.innerText = pointsNeeded > 0 ? pointsNeeded.toFixed(1) : 0;
-        displayReq.innerText = finalVal + "%";
+        const truePointsBanked = accumulatedDP * (dpW / 100);
         
-        if (finalVal > 100) displayReq.className = "text-4xl font-extrabold text-red-600";
-        else if (finalVal <= 0) { displayReq.innerText = "PASS"; displayReq.className = "text-4xl font-extrabold text-green-600"; }
-        else displayReq.className = "text-4xl font-extrabold text-indigo-600";
+        const predictedPointsFromDP = runningAverageDP * (dpW / 100); 
+        
+        const maxPossibleGrade = predictedPointsFromDP + examW;
+
+        displayReq.classList.remove('text-green-600', 'text-indigo-600', 'text-red-600', 'uppercase', 'text-3xl', 'text-4xl');
+
+        if (goal > maxPossibleGrade) {
+            displayReq.innerText = "MAX " + Math.floor(maxPossibleGrade) + "%";
+            displayReq.className = "text-3xl font-extrabold text-gray-600 uppercase";
+            
+            if (explContainer) {
+                explContainer.innerHTML = `
+                    <span class="text-gray-600 font-bold">Goal Unreachable </span><br>
+                    You have currently secured <strong>${truePointsBanked.toFixed(1)}%</strong> of your final module grade.<br><br>
+                    Even if you keep up your ${Math.round(runningAverageDP)}% average and get <strong>100%</strong> on the exam, your final grade caps at <strong>${maxPossibleGrade.toFixed(1)}%</strong>.<br>
+                    Try setting a new goal.
+                `;
+            }
+
+        } else {
+            const pointsNeeded = goal - predictedPointsFromDP;
+            const reqExam = pointsNeeded / (examW / 100);
+            const finalVal = Math.round(reqExam);
+
+            if (finalVal <= 0) {
+                displayReq.innerText = "PASS"; 
+                displayReq.className = "text-4xl font-extrabold text-green-600";
+                
+                if (explContainer) {
+                    explContainer.innerHTML = `
+                        <span class="text-green-600 font-bold">Goal Achieved!</span><br>
+                        Your coursework marks alone have already secured enough points to reach your goal of ${goal}%.
+                    `;
+                }
+
+            } else {
+                displayReq.innerText = finalVal + "%";
+                displayReq.className = "text-4xl font-extrabold text-indigo-600";
+
+                if (explContainer) {
+                    explContainer.innerHTML = `
+                        You have officially secured <strong>${truePointsBanked.toFixed(1)}%</strong> of your final module grade so far.<br><br>
+                       
+                    `;// Assuming you hit the suggested marks to maintain your <strong>${Math.round(runningAverageDP)}%</strong> average, you will need <strong>${finalVal}%</strong> on the final exam.
+                }
+            }
+        }
     }
 }
 

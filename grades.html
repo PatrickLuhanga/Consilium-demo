@@ -10,74 +10,170 @@
     <script src="timetable.js" defer></script>
 
     <style>
-    /* TIMETABLE LAYOUT */
-    :root{
-        --day-col: 100px;    
-        --row-height: 96px;  
-        --hours-count: 17;   
+    :root {
+        --day-col-width: 80px;    
+        --row-height: 70px;  
+        --hours-count: 16; 
+    }
+
+    /* --- TIMETABLE CSS --- */
+    #timetable-wrapper {
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        background: white;
+        width: 100%;
     }
 
     #printable-timetable {
         width: 100%;
-        min-width: 0;
-        overflow-x: hidden;
         position: relative;
     }
 
     .timetable-header {
-        grid-template-columns: var(--day-col) repeat(var(--hours-count), minmax(0, 1fr));
+        display: grid;
+        grid-template-columns: var(--day-col-width) repeat(var(--hours-count), minmax(0, 1fr));
+        position: sticky;
+        top: 0;
+        z-index: 50; 
+        background: white; /* Ensure background so it covers content on scroll */
     }
 
     .timetable-row {
-        grid-template-columns: var(--day-col) repeat(var(--hours-count), minmax(0, 1fr));
+        display: grid;
+        grid-template-columns: var(--day-col-width) repeat(var(--hours-count), minmax(0, 1fr));
         height: var(--row-height);
+        position: relative; 
+        z-index: 10;
     }
 
     #events-container {
         position: absolute;
         inset: 0;
         pointer-events: none;
+        width: 100%;
+        height: 100%;
+        z-index: 20; 
     }
-    .evt-card { pointer-events: auto; }
-    .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    /* PRINT STYLES */
+    .evt-card { 
+        pointer-events: auto; 
+        transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+    .evt-card:hover {
+        z-index: 30;
+        transform: scale(1.02);
+    }
+
+    /* --- CALCULATOR UI --- */
+    #module-grid .rounded-full {
+        font-size: 0.65rem !important; 
+        line-height: 1; padding: 0 4px;
+        display: flex; align-items: center; justify-content: center;
+    }
+    #module-icon { font-size: 1rem !important; }
+    #assessment-list input:focus {
+        border-color: #6366f1 !important; 
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+    }
+
+    /* --- PRINT STYLES (FINAL FIX) --- */
     @media print {
         @page { size: landscape; margin: 0.5cm; }
-        body * { visibility: hidden; }
-        #printable-timetable, #printable-timetable * { visibility: visible; }
-        #printable-timetable {
-            position: absolute; left: 0; top: 0; width: 100%;
-            border: none; box-shadow: none; overflow: visible;
+        
+        :root {
+            /* Shrink day column slightly on print to give events more room */
+            --day-col-width: 50px !important; 
+            --row-height: 60px !important;
         }
-        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-        .overflow-x-auto, .overflow-y-auto { overflow: visible !important; height: auto !important; }
+
+        /* 1. HIDE EVERYTHING */
+        body { visibility: hidden; background: white; }
+        
+        /* 2. POSITION PRINT AREA */
+        #print-area {
+            visibility: visible;
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+        }
+
+        #print-area * { visibility: visible; }
+
+        /* 3. FIX HEADER (STATIC = NO OVERLAP) */
+        .timetable-header {
+            position: static !important;
+            display: grid !important;
+            grid-template-columns: var(--day-col-width) repeat(var(--hours-count), minmax(0, 1fr)) !important;
+            background-color: #f1f5f9 !important;
+            border-bottom: 2px solid #cbd5e1;
+            color: #64748b !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        /* 4. FIX ROWS */
+        .timetable-row {
+            display: grid !important;
+            grid-template-columns: var(--day-col-width) repeat(var(--hours-count), minmax(0, 1fr)) !important;
+            height: auto !important;
+            min-height: var(--row-height);
+            border-bottom: 1px solid #e2e8f0;
+            break-inside: avoid;
+        }
+        
+        /* 5. FIX WRAPPER */
+        #timetable-wrapper {
+            width: 100% !important;
+            border: 1px solid #cbd5e1;
+            box-shadow: none;
+            overflow: visible !important;
+        }
+        
+        /* 6. LEGEND GRID FIX */
+        #legend-container {
+            display: block !important;
+            margin-top: 2rem;
+            border: 1px solid #e2e8f0;
+            break-inside: avoid;
+        }
+        #legend-grid {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 1rem !important;
+        }
+
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
     }
     </style>
 </head>
-<body class="bg-gray-100 font-sans min-h-screen">
+<body class="bg-slate-50 font-sans min-h-screen text-slate-800">
 
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
       <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <div class="flex items-center gap-8">
-          
-          <div class="flex items-center gap-2 text-indigo-900 font-extrabold text-xl">
-            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
+          <div class="flex items-center gap-2 text-indigo-900 font-black tracking-tight text-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" height="26" viewBox="0 -960 960 960" width="26" fill="currentColor">
                 <path d="M480-120 200-272v-240L40-600l440-240 440 240v320h-80v-276l-80 44v240L480-120Zm0-332 274-148-274-148-274 148 274 148Zm0 241 200-108v-151L480-360 280-470v151l200 108Zm0-241Zm0 90Zm0 0Z"/>
             </svg>
             Consilium
           </div>
-
-          <nav class="hidden md:flex gap-6 text-sm text-gray-600 items-center">
-            <a href="dashboard.html" class="hover:text-indigo-700 transition">Dashboard</a>
-            <a href="bursaries.html" class="hover:text-indigo-700 transition">Bursaries</a>
-            <a href="grades.html" class="text-indigo-600 font-bold border-b-2 border-indigo-600 pb-1">Grades/Timetable</a> 
+          <nav class="hidden md:flex gap-6 text-sm text-slate-500 items-center font-medium">
+            <a href="dashboard.html" class="hover:text-indigo-600 transition-colors">Dashboard</a>
+            <a href="bursaries.html" class="hover:text-indigo-600 transition-colors">Bursaries</a>
+            <a href="grades.html" class="text-indigo-700 font-bold border-b-2 border-indigo-600 pb-1">Grades/Timetable</a> 
           </nav>
         </div>
-        
         <div class="flex items-center gap-4">
-          <a href="profile.html" class="hover:opacity-80 transition-opacity" title="View Profile">
-              <div class="h-9 w-9 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-semibold shadow-sm ring-2 ring-indigo-100">
+          <a href="profile.html" class="hover:opacity-80 transition-opacity transform hover:scale-105" title="View Profile">
+              <div class="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 text-white flex items-center justify-center text-sm font-bold shadow-md ring-2 ring-indigo-50">
                 ..
               </div>
           </a>
@@ -87,177 +183,173 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-        <div class="flex flex-col items-center mb-10">
-            <h1 class="text-3xl font-bold text-gray-900 mb-6">My Modules</h1>
-            <div id="module-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl">
-                </div>
+        <div class="flex flex-col items-center mb-12">
+            <h1 class="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">My Modules</h1>
+            <p class="text-slate-500 text-sm mb-6">Select a module to calculate your grades</p>
+            <div id="module-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 w-full max-w-5xl"></div>
         </div>
 
-        <div id="calculator-section" class="max-w-4xl mx-auto">
-            
-            <div id="empty-state-msg" class="hidden bg-white rounded-xl border-2 border-dashed border-gray-300 p-12 text-center">
-                <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                <h3 class="text-lg font-bold text-gray-700">No Modules Selected</h3>
-                <p class="text-gray-500 mt-2">Click "New Module" above to start tracking your grades.</p>
+        <div id="calculator-section" class="max-w-5xl mx-auto mb-16">
+            <div id="empty-state-msg" class="hidden bg-white rounded-2xl border-2 border-dashed border-slate-300 p-16 text-center shadow-sm">
+                <svg class="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                <h3 class="text-xl font-bold text-slate-700">No Module Selected</h3>
+                <p class="text-slate-500 mt-2 font-medium">Click "New Module" above to start tracking your grades.</p>
             </div>
-
-            <div id="calculator-ui" class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8 hidden">
-      
-              <div class="bg-gray-800 p-6 flex justify-between items-center text-white">
-                  <div class="flex items-center gap-4">
-                    <div id="module-icon" class="h-10 w-10 rounded-full bg-indigo-500 flex items-center justify-center font-bold">..</div>
-                    <div>
-                      <h2 id="module-title" class="text-xl font-bold">...</h2>
-                      <div class="flex gap-4 text-xs text-gray-400 mt-1">
-                        <span>Exam Weight: 
-                            <input type="number" id="exam-weight-config" class="w-8 bg-transparent text-white border-b border-gray-600 focus:outline-none text-center"> %
+            
+            <div id="calculator-ui" class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden hidden">
+               <div class="bg-slate-900 p-6 sm:px-8 flex flex-col md:flex-row justify-between items-start md:items-center text-white gap-6">
+                  <div class="flex items-center gap-4 w-full md:w-auto">
+                    <div id="module-icon" class="h-14 w-14 shrink-0 rounded-full bg-indigo-500 shadow-inner flex items-center justify-center font-bold text-white">..</div>
+                    <div class="flex-1">
+                      <h2 id="module-title" class="text-2xl font-bold tracking-tight text-white truncate max-w-xs sm:max-w-sm">...</h2>
+                      <div class="flex gap-4 text-xs text-indigo-200 mt-2 font-medium tracking-wide">
+                        <span class="flex items-center gap-1">Exam Weight: 
+                            <input type="number" id="exam-weight-config" class="w-12 bg-white/10 text-white border border-white/20 rounded px-1 py-0.5 focus:bg-white focus:text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-center transition-colors"> %
                         </span>
-                        <span id="dp-weight-display" class="italic text-gray-500">(DP Weight calculated automatically)</span>
+                        <span class="flex items-center gap-1">DP Weight: 
+                            <input type="number" id="dp-weight-config" class="w-12 bg-white/10 text-white border border-white/20 rounded px-1 py-0.5 focus:bg-white focus:text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-center transition-colors"> %
+                        </span>
                       </div>
                     </div>
                   </div>
-
-                  <div class="flex items-center gap-4">
-                      <div class="flex items-center gap-2 bg-gray-700 px-3 py-1 rounded-lg">
-                        <label class="text-xs uppercase font-semibold text-gray-300">My Goal:</label>
-                        <input type="number" id="goal-input" class="w-12 bg-transparent text-white font-bold text-right focus:outline-none border-b border-gray-500 transition">
-                        <span class="text-sm">%</span>
+                  <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+                      <div class="flex items-center gap-3 bg-slate-800 border border-slate-700 px-4 py-2 rounded-xl shadow-inner">
+                        <label class="text-xs uppercase font-bold text-slate-400 tracking-wider">My Goal</label>
+                        <div class="flex items-center">
+                            <input type="number" id="goal-input" class="w-14 bg-transparent text-white font-black text-right focus:outline-none focus:text-indigo-300 transition-colors text-xl" value="0">
+                            <span class="text-slate-400 ml-1 font-bold">%</span>
+                        </div>
                       </div>
-
-                      <button onclick="deleteActiveModule()" class="text-gray-400 hover:text-red-400 transition" title="Delete Module">
+                      <button onclick="deleteActiveModule()" class="h-10 w-10 flex items-center justify-center rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:text-red-400 hover:bg-red-900/20 hover:border-red-800 transition-all" title="Delete Module">
                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                       </button>
                   </div>
               </div>
-      
-              <div class="md:grid md:grid-cols-[1fr_260px]">
-                
-                <div class="p-6 border-b md:border-b-0 md:border-r border-gray-100">
-                  
-                    <div class="grid grid-cols-1 sm:grid-cols-[1fr_80px_80px_40px] gap-3 items-center mb-2">
-                        <div class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Assessment</div>
-                        <div class="text-xs text-gray-500 font-semibold uppercase tracking-wider text-center">Weight</div>
-                        <div class="text-xs text-gray-500 font-semibold uppercase tracking-wider text-center">My Mark</div>
-                        <div class="text-xs text-gray-500 font-semibold uppercase tracking-wider text-center">Del</div>
+              <div class="md:grid md:grid-cols-[1fr_300px]">
+                <div class="p-6 sm:p-8 border-b md:border-b-0 md:border-r border-slate-100 bg-white">
+                    <div class="grid grid-cols-1 sm:grid-cols-[1fr_75px_75px_75px_40px] gap-3 items-center mb-3 px-1">
+                        <div class="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Assessment Name</div>
+                        <div class="text-[11px] text-slate-400 font-bold uppercase tracking-widest text-center">Weight</div>
+                        <div class="text-[11px] text-indigo-400 font-bold uppercase tracking-widest text-center">My Mark</div>
+                        <div class="text-[11px] text-slate-400 font-bold uppercase tracking-widest text-center">Suggested</div>
+                        <div class="text-[11px] text-slate-400 font-bold uppercase tracking-widest text-center">Del</div>
                     </div>
-
-                    <div id="assessment-list" class="grid grid-cols-1 sm:grid-cols-[1fr_80px_80px_40px] gap-3 items-center">
+                    <div id="assessment-list" class="grid grid-cols-1 sm:grid-cols-[1fr_75px_75px_75px_40px] gap-3 items-center"></div>
+                    <div class="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div>
+                            <span class="text-sm font-bold text-slate-400 uppercase tracking-widest block mb-1">Accumulated DP Points</span>
+                            <span id="display-dp" class="text-2xl font-black text-slate-800">0%</span>
                         </div>
-
-                    <div class="bg-gray-50 border-t border-gray-100 flex justify-end p-3 mt-6 rounded-lg">
-                        <button id="save-calc-btn" class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-indigo-700 shadow-md transition transform active:scale-95 flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                            Save & Calculate
+                        <button id="save-calc-btn" class="w-full sm:w-auto bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 hover:shadow-lg transition-all transform active:scale-95 flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                            Save Grades
                         </button>
                     </div>
-                  
-                    <div class="mt-4 flex justify-between items-center pt-4 border-t border-gray-100">
-                        <span class="text-sm font-medium text-gray-600">Current DP:</span>
-                        <span id="display-dp" class="text-xl font-bold text-gray-800">0%</span>
-                    </div>
                 </div>
-
-                <div class="p-6 bg-indigo-50 flex flex-col justify-center items-center text-center">
-                    <p class="text-sm text-indigo-900 font-medium mb-2">
-                        To reach your goal of <span id="display-goal-text">0</span>%:
-                    </p>
-
-                    <div class="bg-white px-6 py-4 rounded-xl border border-indigo-100 mb-4 shadow-sm">
-                        <span class="block text-xs text-gray-500 uppercase tracking-wider mb-1">Required Exam Mark</span>
-                        <span id="display-exam-req" class="text-4xl font-extrabold text-indigo-600">0%</span>
+                <div class="p-6 sm:p-8 bg-slate-50 flex flex-col justify-center items-center text-center relative overflow-hidden">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Goal Projection</h3>
+                    <div class="bg-white px-8 py-6 rounded-2xl border border-slate-200 w-full shadow-sm relative z-10 mb-6 transition-all hover:shadow-md">
+                        <span class="block text-[11px] text-indigo-500 font-bold uppercase tracking-widest mb-2">Required Exam Mark</span>
+                        <span id="display-exam-req" class="text-5xl font-black text-slate-800 tracking-tight drop-shadow-sm">0%</span>
                     </div>
-
-                    <p id="points-explanation" class="text-xs text-indigo-800 max-w-xs leading-relaxed mt-4">
+                    <p id="points-explanation" class="text-sm text-slate-600 leading-relaxed max-w-[240px]">
                         Your current marks have secured 
-                        <strong id="expl-points-in-hand">0</strong>% of your final year grade.
+                        <strong id="expl-points-in-hand" class="text-slate-900">0</strong>% of your final year grade.
                         <br><br>
-                        To reach <span id="display-goal-text">0</span>%, you still need to earn 
-                        <strong id="expl-points-needed">0</strong>% from the final exam.
+                        To reach <span id="display-goal-text" class="font-bold text-slate-900">0</span>%, you still need to earn 
+                        <strong id="expl-points-needed" class="text-indigo-600">0</strong>% from the final exam.
                     </p>
                 </div>
               </div>
             </div>
         </div>
 
-        <div class="mt-12 border-t border-gray-200 pt-10 mb-20">
-            <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
+        <div class="mt-16 pt-12 border-t border-slate-200">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-8">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-900">Weekly Schedule</h2>
-                    <p class="text-gray-600">Build your master plan and print it out.</p>
+                    <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight mb-1">Weekly Schedule</h2>
+                    <p class="text-slate-500 font-medium">Fits perfectly on screen and paper.</p>
                 </div>
                 
-                <div class="flex gap-2">
+                <div class="flex gap-3">
                     <button onclick="document.getElementById('add-event-modal').classList.remove('hidden')" 
-                            class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 shadow-sm transition flex items-center gap-2">
-                        <span>+</span> Add Class
+                            class="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-indigo-700 shadow-md hover:shadow-lg transition-all transform active:scale-95 flex items-center gap-2">
+                        <span class="text-lg leading-none">+</span> Add Class
                     </button>
-                    
-                    <button onclick="window.print()" 
-                            class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-50 transition flex items-center gap-2">
+                    <button onclick="document.getElementById('legend-container').classList.remove('hidden'); window.print()" 
+                            class="bg-white border border-slate-300 text-slate-700 px-5 py-2.5 rounded-xl font-bold hover:bg-slate-50 hover:text-indigo-600 transition-colors shadow-sm flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                        Print / Save PDF
+                        Print PDF
                     </button>
                 </div>
             </div>
 
-            <div id="printable-timetable" class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden w-full">
-                <div class="grid timetable-header border-b border-gray-200 bg-gray-50 text-center text-[10px] font-bold text-gray-500 uppercase">
-                    <div class="py-3 border-r border-gray-200 bg-white sticky left-0 z-10">Day</div>
-                    <div class="py-3 border-r border-gray-200">05</div>
-                    <div class="py-3 border-r border-gray-200">06</div>
-                    <div class="py-3 border-r border-gray-200">07</div>
-                    <div class="py-3 border-r border-gray-200">08</div>
-                    <div class="py-3 border-r border-gray-200">09</div>
-                    <div class="py-3 border-r border-gray-200">10</div>
-                    <div class="py-3 border-r border-gray-200">11</div>
-                    <div class="py-3 border-r border-gray-200">12</div>
-                    <div class="py-3 border-r border-gray-200">13</div>
-                    <div class="py-3 border-r border-gray-200">14</div>
-                    <div class="py-3 border-r border-gray-200">15</div>
-                    <div class="py-3 border-r border-gray-200">16</div>
-                    <div class="py-3 border-r border-gray-200">17</div>
-                    <div class="py-3 border-r border-gray-200">18</div>
-                    <div class="py-3 border-r border-gray-200">19</div>
-                    <div class="py-3 border-r border-gray-200">20</div>
-                    <div class="py-3 border-r border-gray-200">21</div>
+            <div id="print-area">
+                <div id="timetable-wrapper">
+                    <div id="printable-timetable">
+                        <div class="timetable-header border-b border-slate-200 bg-slate-100 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                            <div class="py-4 border-r border-slate-200 bg-slate-50 sticky left-0 z-10 shadow-sm">Day</div>
+                            <div class="py-4 border-r border-slate-200">05:00</div>
+                            <div class="py-4 border-r border-slate-200">06:00</div>
+                            <div class="py-4 border-r border-slate-200">07:00</div>
+                            <div class="py-4 border-r border-slate-200">08:00</div>
+                            <div class="py-4 border-r border-slate-200">09:00</div>
+                            <div class="py-4 border-r border-slate-200">10:00</div>
+                            <div class="py-4 border-r border-slate-200">11:00</div>
+                            <div class="py-4 border-r border-slate-200">12:00</div>
+                            <div class="py-4 border-r border-slate-200">13:00</div>
+                            <div class="py-4 border-r border-slate-200">14:00</div>
+                            <div class="py-4 border-r border-slate-200">15:00</div>
+                            <div class="py-4 border-r border-slate-200">16:00</div>
+                            <div class="py-4 border-r border-slate-200">17:00</div>
+                            <div class="py-4 border-r border-slate-200">18:00</div>
+                            <div class="py-4 border-r border-slate-200">19:00</div>
+                            <div class="py-4 border-r border-slate-200">20:00</div>
+                        </div>
+
+                        <div class="relative w-full">
+                            <div id="timetable-grid-background" class="text-sm text-slate-700 w-full"></div>
+                            <div id="events-container"></div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="relative w-full">
-                    <div id="timetable-grid-background" class="grid grid-rows-7 text-sm text-gray-700 w-full"></div>
-                    <div id="events-container" class="absolute inset-0 pointer-events-none w-full"></div>
+                <div id="legend-container" class="mt-8 bg-white border border-slate-200 rounded-xl p-6 hidden">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Module Key</h3>
+                    <div id="legend-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="add-event-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-center justify-center min-h-screen px-4 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="document.getElementById('add-event-modal').classList.add('hidden')"></div>
+    <div id="add-event-modal" class="fixed inset-0 z-[100] overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-slate-900 bg-opacity-60 backdrop-blur-sm transition-opacity" onclick="document.getElementById('add-event-modal').classList.add('hidden')"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="relative inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Add to Timetable</h3>
-                    <form class="mt-4 space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Subject / Title</label>
-                            <input id="evt-title" type="text" placeholder="e.g., Development Software 1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 border">
+            <div class="relative inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100">
+                <div class="bg-white px-6 pt-6 pb-6">
+                    <h3 class="text-xl leading-6 font-extrabold text-slate-900 tracking-tight" id="modal-title">Add to Timetable</h3>
+                    <form class="mt-6 space-y-5">
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="col-span-1">
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Code</label>
+                                <input id="evt-code" type="text" placeholder="IPRT301" class="block w-full border-slate-300 rounded-lg shadow-sm p-3 border focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-bold uppercase">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Full Description</label>
+                                <input id="evt-title" type="text" placeholder="Development Software 1" class="block w-full border-slate-300 rounded-lg shadow-sm p-3 border focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+                            </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-5">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Day</label>
-                                <select id="evt-day" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 border">
-                                    <option value="1">Monday</option>
-                                    <option value="2">Tuesday</option>
-                                    <option value="3">Wednesday</option>
-                                    <option value="4">Thursday</option>
-                                    <option value="5">Friday</option>
-                                    <option value="6">Saturday</option>
-                                    <option value="7">Sunday</option>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Day</label>
+                                <select id="evt-day" class="block w-full border-slate-300 rounded-lg shadow-sm p-3 border focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-white">
+                                    <option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option><option value="7">Sunday</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Type</label>
-                                <select id="evt-type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 border">
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Type (Color)</label>
+                                <select id="evt-type" class="block w-full border-slate-300 rounded-lg shadow-sm p-3 border focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-white">
                                     <option value="blue">Lecture (Blue)</option>
                                     <option value="green">Study (Green)</option>
                                     <option value="gray">Personal (Gray)</option>
@@ -265,29 +357,28 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-5">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Start Time</label>
-                                <select id="evt-start" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 border">
-                                    <option value="5">05:00</option><option value="6">06:00</option><option value="7">07:00</option><option value="8" selected>08:00</option><option value="9">09:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Start Time</label>
+                                <select id="evt-start" class="block w-full border-slate-300 rounded-lg shadow-sm p-3 border focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-white">
+                                    <option value="5">05:00</option><option value="6">06:00</option><option value="7">07:00</option><option value="8" selected>08:00</option><option value="9">09:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Duration</label>
-                                <select id="evt-duration" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 border">
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Duration</label>
+                                <select id="evt-duration" class="block w-full border-slate-300 rounded-lg shadow-sm p-3 border focus:ring-2 focus:ring-indigo-500 outline-none text-sm bg-white">
                                     <option value="1">1 Hour</option><option value="2">2 Hours</option><option value="3">3 Hours</option><option value="4">4 Hours</option>
                                 </select>
                             </div>
                         </div>
                     </form>
                 </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button id="btn-save-event" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 sm:ml-3 sm:w-auto">Add to Calendar</button>
-                    <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto" onclick="document.getElementById('add-event-modal').classList.add('hidden')">Cancel</button>
+                <div class="bg-slate-50 px-6 py-4 flex flex-col sm:flex-row-reverse gap-3 rounded-b-2xl border-t border-slate-100">
+                    <button id="btn-save-event" type="button" class="w-full sm:w-auto inline-flex justify-center rounded-xl px-6 py-2.5 bg-indigo-600 text-sm font-bold text-white hover:bg-indigo-700 shadow-sm transition-colors outline-none">Save Class</button>
+                    <button type="button" class="w-full sm:w-auto inline-flex justify-center rounded-xl border border-slate-300 px-6 py-2.5 bg-white text-sm font-bold text-slate-700 hover:bg-slate-50 shadow-sm transition-colors outline-none" onclick="document.getElementById('add-event-modal').classList.add('hidden')">Cancel</button>
                 </div>
             </div>
         </div>
     </div>
-
 </body>
 </html>

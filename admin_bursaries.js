@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!currentUser) {
         window.location.href = "login.html";
@@ -35,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const provider = document.getElementById('provider').value;
             const link = document.getElementById('external-link').value;
             const description = document.getElementById('description').value;
-            
             const maxIncome = document.getElementById('max-income').value;
             const minAverage = document.getElementById('min-average').value;
             const deadline = document.getElementById('deadline').value;
@@ -67,5 +65,4 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'admin_dashboard.html'; 
         });
     }
-
 });

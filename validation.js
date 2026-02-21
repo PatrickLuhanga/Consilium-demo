@@ -4,7 +4,7 @@ const protectedPages = [
 ];
 
 const pathParts = window.location.pathname.split("/");
-const currentPage = pathParts[pathParts.length - 1]; 
+const currentPage = pathParts[pathParts.length - 1];
 
 if (protectedPages.includes(currentPage) && !localStorage.getItem("currentUser")) {
     window.location.href = "login.html";
@@ -25,7 +25,6 @@ function normalizeEmail(raw) {
 if (form) {
     form.addEventListener("submit", (e) => {
         e.preventDefault();
-
         let errors = [];
 
         if (form.dataset.type === "signup") {
@@ -35,7 +34,6 @@ if (form) {
         }
 
         if (errors.length === 0) {
-            
             if (form.dataset.type === "signup") {
                 if (!email_input || !psw_input) return;
 
@@ -43,7 +41,7 @@ if (form) {
                     fname: fname_input ? fname_input.value.trim() : "",
                     lname: lname_input ? lname_input.value.trim() : "",
                     email: normalizeEmail(email_input.value),
-                    affiliation: affiliation_input ? affiliation_input.value : "student", 
+                    affiliation: affiliation_input ? affiliation_input.value : "student",
                     password: psw_input.value,
                     studentNumber: "",
                     department: "",
@@ -61,7 +59,6 @@ if (form) {
 
                 users.push(user);
                 localStorage.setItem("users", JSON.stringify(users));
-
                 alert("Account created! Please log in.");
                 window.location.href = "login.html";
             }
@@ -174,5 +171,4 @@ function clearErrors() {
         const el = document.getElementById(id);
         if (el) el.textContent = "";
     });
-
 }

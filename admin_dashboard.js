@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!currentUser) {
         window.location.href = "login.html";
@@ -89,7 +88,6 @@ function deleteBursary(id) {
         let bursaries = JSON.parse(localStorage.getItem('bursaries')) || [];
         bursaries = bursaries.filter(b => b.id !== id);
         localStorage.setItem('bursaries', JSON.stringify(bursaries));
-        
         loadDashboard();
     }
 }

@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!currentUser) {
         window.location.href = "login.html";
@@ -16,132 +15,54 @@ document.addEventListener('DOMContentLoaded', () => {
     if(avatar) avatar.textContent = initials;
 
     const logoutBtn = document.getElementById('logout-btn');
-    if(logoutBtn) {
+    if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
-            if(confirm("Logout?")) {
+            if(confirm("Are you sure you want to logout?")) {
                 localStorage.removeItem('currentUser');
                 window.location.href = "login.html";
             }
         });
     }
 
-    const apps = JSON.parse(localStorage.getItem('applications')) || [];
-    if (apps.length === 0) {
-        const testApp = {
-            id: 999,
-            studentName: "Test Student",
-            studentNumber: "22012345",
-            studentFaculty: "Engineering",
-            studentDepartment: "Civil Engineering",
-            studentAverage: 75,
-            bursaryTitle: "Toyota Engineering Bursary",
-            status: "Applied",
-            dateApplied: new Date().toLocaleDateString(),
-            userEmail: "test@student.com",
-            bursaryId: 1
-        };
-        
-        localStorage.setItem('applications', JSON.stringify([testApp]));
-        location.reload(); 
-        return;
-    }
-
-    renderTable();
-
-    const filterFac = document.getElementById('filterFaculty');
-    const filterStat = document.getElementById('filterStatus');
-    const resetBtn = document.getElementById('resetFilters');
-
-    if(filterFac) filterFac.addEventListener('change', renderTable);
-    if(filterStat) filterStat.addEventListener('change', renderTable);
-    if(resetBtn) resetBtn.addEventListener('click', () => {
-        if(filterFac) filterFac.value = 'all';
-        if(filterStat) filterStat.value = 'all';
-        renderTable();
-    });
-});
-
-function renderTable() {
-    const tbody = document.getElementById('applications-table-body');
-    const emptyState = document.getElementById('empty-state');
-    const applications = JSON.parse(localStorage.getItem('applications')) || [];
+    const form = document.getElementById('admin-add-bursary-form');
     
-    const facultyFilter = document.getElementById('filterFaculty') ? document.getElementById('filterFaculty').value.toLowerCase() : 'all';
-    const statusFilter = document.getElementById('filterStatus') ? document.getElementById('filterStatus').value : 'all';
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
 
-    tbody.innerHTML = '';
-    let visibleCount = 0;
+            const name = document.getElementById('bursary-name').value;
+            const provider = document.getElementById('provider').value;
+            const link = document.getElementById('external-link').value;
+            const description = document.getElementById('description').value;
+            const maxIncome = document.getElementById('max-income').value;
+            const minAverage = document.getElementById('min-average').value;
+            const deadline = document.getElementById('deadline').value;
 
-    const sortedApps = applications.sort((a, b) => new Date(b.dateApplied) - new Date(a.dateApplied));
+            const selectedFaculties = [];
+            const checkboxes = document.querySelectorAll('input[name="eligible-faculty"]:checked');
+            checkboxes.forEach((checkbox) => {
+                selectedFaculties.push(checkbox.value);
+            });
 
-    sortedApps.forEach(app => {
-        
-        if (statusFilter !== 'all' && app.status !== statusFilter) return;
-        const cleanFaculty = (app.studentFaculty || "").toLowerCase();
-        if (facultyFilter !== 'all' && !cleanFaculty.includes(facultyFilter)) return;
+            const newBursary = {
+                id: Date.now(), 
+                title: name,
+                provider: provider,
+                link: link,
+                description: description,        
+                maxIncome: maxIncome || "N/A",
+                minAverage: Number(minAverage),  
+                deadline: deadline,
+                faculties: selectedFaculties,
+                status: "Active"
+            };
 
-        visibleCount++;
+            let bursaryList = JSON.parse(localStorage.getItem('bursaries')) || [];
+            bursaryList.push(newBursary);
+            localStorage.setItem('bursaries', JSON.stringify(bursaryList));
 
-        let statusBadge = "";
-        if (app.status === 'Applied') {
-            statusBadge = `<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-lg font-bold">Applied</span>`;
-        } else if (app.status === 'Interested') {
-            statusBadge = `<span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-lg font-bold">To Do</span>`;
-        } else {
-             statusBadge = `<span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-lg font-bold">${app.status}</span>`;
-        }
-
-        const sNum = app.studentNumber || "-"; 
-        const sDept = app.studentDepartment || "-"; 
-
-        const row = document.createElement('tr');
-        row.className = "hover:bg-gray-50 transition border-b border-gray-50";
-        row.innerHTML = `
-            <td class="px-6 py-4 text-gray-500 font-mono text-xs">${sNum}</td>
-            <td class="px-6 py-4 font-bold text-gray-900">${app.studentName}</td>
-            <td class="px-6 py-4 text-gray-600">${app.studentFaculty}</td>
-            <td class="px-6 py-4 text-gray-600 text-xs">${sDept}</td>
-            <td class="px-6 py-4 font-medium">${app.studentAverage}%</td>
-            <td class="px-6 py-4 text-indigo-700 font-medium">${app.bursaryTitle}</td>
-            <td class="px-6 py-4 text-gray-500 text-xs">${app.dateApplied}</td>
-            <td class="px-6 py-4 text-right">${statusBadge}</td>
-        `;
-        tbody.appendChild(row);
-    });
-
-    if (visibleCount === 0) {
-        if(emptyState) emptyState.classList.remove('hidden');
-    } else {
-        if(emptyState) emptyState.classList.add('hidden');
+            alert('✅ Bursary Published Successfully!');
+            window.location.href = 'admin_dashboard.html'; 
+        });
     }
-}
-
-function downloadCSV() {
-    const applications = JSON.parse(localStorage.getItem('applications')) || [];
-    if (applications.length === 0) { alert("No data to export."); return; }
-
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Student Number,Student Name,Faculty,Department,Average,Bursary,Status,Date\n"; 
-
-    applications.forEach(app => {
-        const row = [
-            app.studentNumber || "-",
-            app.studentName || "Unknown",
-            app.studentFaculty || "Unknown",
-            app.studentDepartment || "-",
-            app.studentAverage || "0",
-            app.bursaryTitle || "Unknown",
-            app.status || "Unknown",
-            app.dateApplied || "-"
-        ].join(",");
-        csvContent += row + "\n";
-    });
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "consilium_applications.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
+});

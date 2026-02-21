@@ -1,37 +1,37 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // 1. GET USER
+   
     const user = JSON.parse(localStorage.getItem('currentUser'));
     if (!user) {
         window.location.href = "login.html";
         return;
     }
 
-    // 🛑 2. ROLE CHECK (The Gatekeeper)
-    // If an Admin tries to load this student page, send them to Admin Dashboard
+   
+   
     if (user.affiliation === 'admin') {
         window.location.href = "admin_dashboard.html";
         return;
     }
 
-    // 3. SET HEADER INITIALS & NAME
+    
     const initials = ((user.fname?.[0] || 'U') + (user.lname?.[0] || '')).toUpperCase();
     
-    // Header Avatar
-    const avatar = document.getElementById("header-avatar"); // Ensure your HTML uses this ID or class
+   
+    const avatar = document.getElementById("header-avatar");
     if (!avatar) {
-         // Fallback for class-based selection if ID is missing
+         
          const avatarClass = document.querySelector(".rounded-full");
          if(avatarClass) avatarClass.textContent = initials;
     } else {
         avatar.textContent = initials;
     }
     
-    // Welcome Message
+ 
     const welcomeEl = document.getElementById('welcome-msg');
     if(welcomeEl) welcomeEl.textContent = `Welcome back, ${user.fname}`;
 
-    // 4. LOGOUT LOGIC (Crucial: This was missing!)
+  
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
@@ -42,16 +42,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 5. LOAD DATA
+  
     calculateStats(user);
     renderBursaryPreview(user);
 });
 
-// ==========================================
-// 1. ACADEMIC STATS & SUBJECTS
-// ==========================================
+
 function calculateStats(user) {
-    // Get user's modules (filtered by email)
+   
     const allModules = JSON.parse(localStorage.getItem('consilium_modules')) || [];
     const modules = allModules.filter(m => m.userEmail === user.email);
 
@@ -60,7 +58,7 @@ function calculateStats(user) {
     let riskCount = 0;
 
     modules.forEach(m => {
-        // Calculate average for this specific module
+        
         let modTotalW = 0;
         let modWeightedSum = 0;
         
@@ -73,7 +71,7 @@ function calculateStats(user) {
 
         const currentAvg = modTotalW > 0 ? (modWeightedSum / modTotalW) : 0;
         
-        // Add to global stats
+        
         weightedSum += currentAvg;
         totalWeight++;
 
@@ -82,12 +80,12 @@ function calculateStats(user) {
 
     const globalAvg = totalWeight > 0 ? Math.round(weightedSum / totalWeight) : 0;
 
-    // --- UPDATE BIG NUMBERS ---
+   
     setText('dash-avg-mark', `${globalAvg}%`);
     setText('dash-module-count', `${modules.length} subjects`);
     setText('dash-risk-count', riskCount);
 
-    // --- RENDER SUBJECT LIST ---
+   
     const subjContainer = document.getElementById('subject-status-container');
     if(subjContainer) {
         subjContainer.innerHTML = '';
@@ -130,9 +128,7 @@ function calculateStats(user) {
     }
 }
 
-// ==========================================
-// 2. BURSARY MATCHES & APPLICATIONS
-// ==========================================
+
 function renderBursaryPreview(user) {
     const container = document.getElementById('bursary-list-container');
     if(!container) return;
@@ -140,11 +136,11 @@ function renderBursaryPreview(user) {
     const bursaries = JSON.parse(localStorage.getItem('bursaries')) || [];
     const applications = JSON.parse(localStorage.getItem('applications')) || [];
 
-    // Filter Applications for this user
+   
     const myApps = applications.filter(a => a.userEmail === user.email);
     setText('dash-app-count', myApps.length); 
 
-    // --- NORMALIZER ---
+    
     const normalize = (str) => {
         if (!str) return "";
         return str.toLowerCase()
