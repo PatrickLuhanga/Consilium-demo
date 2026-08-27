@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resetBtn.addEventListener('click', () => {
             document.getElementById('filterMatch').value = 'all';
             document.getElementById('filterStatus').value = '';
-            document.getElementById('filterFaculty').value = '';
+            document.getElementById('filterFaculty').value = currentUser.faculty || '';
             document.getElementById('filterSearch').value = '';
             renderBursaryGrid();
         });
@@ -80,7 +80,7 @@ function renderBursaryGrid() {
 
     const fMatch = document.getElementById('filterMatch') ? document.getElementById('filterMatch').value : 'all';
     const fStatus = document.getElementById('filterStatus') ? document.getElementById('filterStatus').value : '';
-    const fFaculty = document.getElementById('filterFaculty') ? document.getElementById('filterFaculty').value : '';
+    const fFaculty = document.getElementById('filterFaculty') ? document.getElementById('filterFaculty').value : user.faculty || '';
     const fSearch = document.getElementById('filterSearch') ? document.getElementById('filterSearch').value.toLowerCase() : '';
 
     grid.innerHTML = '';

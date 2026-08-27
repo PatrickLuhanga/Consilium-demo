@@ -1,6 +1,6 @@
 const protectedPages = [
     "dashboard.html", "profile.html", "bursaries.html", "grades.html", 
-    "admin_dashboard.html", "admin_bursaries.html", "admin_applications.html"
+    "admin_dashboard.html", "admin_bursaries.html", "create_bursaries.html", "admin_applications.html"
 ];
 
 const pathParts = window.location.pathname.split("/");
